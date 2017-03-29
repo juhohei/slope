@@ -18,6 +18,10 @@ class Observable extends React.Component {
   render () {
     const value = this.state.value
 
+    if (value === null) {
+      return null
+    }
+
     return React.isValidElement(value) ? value : <span>{value}</span>
   }
 }
@@ -25,3 +29,4 @@ class Observable extends React.Component {
 export function lift (stream) {
   return <Observable stream={stream}/>
 }
+
