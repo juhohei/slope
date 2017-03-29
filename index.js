@@ -1,9 +1,9 @@
-import {Stream} from './src/create-stream'
+import {Action} from './src/create-action'
 import * as S   from './src/stream'
 import {lift}   from './src/lift'
 
 export {
-  Stream,
+  Action,
   S,
   lift
 }
