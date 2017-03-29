@@ -13,7 +13,7 @@ export const scan = (fn, initial, stream) => sink => {
   sink(payload)
   return stream(value => {
     payload = fn(payload, value)
-    sink(value)
+    sink(payload)
   })
 }
 
