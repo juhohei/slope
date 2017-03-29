@@ -25,3 +25,5 @@ export const startWith = (initial, stream) => sink => {
 export const flatMap = (fn, stream) => sink =>
   stream(value => fn(value)(sink))
 
+export const fromPromise = promise => sink =>
+  promise.then(sink)
