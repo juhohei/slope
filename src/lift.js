@@ -11,7 +11,7 @@ class Observable extends React.Component {
     this.unsubscribe = this.props.stream(value => this.setState({value}))
   }
 
-  componentWillUnMount () {
+  componentWillUnmount () {
     this.unsubscribe()
   }
 
