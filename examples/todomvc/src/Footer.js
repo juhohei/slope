@@ -1,8 +1,8 @@
 import React from 'react'
 
-import {currentRouteS} from './state'
-import {navigate}      from './actions'
-import {S, lift}       from '../../..'
+import {currentRouteS, countS} from './state'
+import {navigate, clear}       from './actions'
+import {S, lift}               from '../../..'
 
 const routes = [
   {
@@ -22,10 +22,9 @@ const routes = [
 export default function Footer () {
   return (
     <footer className="footer">
-      {/*lift(countP
-        .map('.remaining')
-        .map(n => <span className="todo-count"><strong>{n}</strong> item{n !== 1 ? 's' : ''} left</span>)
-      )*/}
+      {lift(S.map(todos => (
+        <span className="todo-count"><strong>{todos.remaining}</strong> item{todos.remaining !== 1 ? 's' : ''} left</span>
+      ), countS))}
       <ul className="filters">
         {lift(S.map(currentRoute => routes.map(route => (
           <li key={route.href}>
@@ -37,13 +36,10 @@ export default function Footer () {
           </li>
         )), currentRouteS))}
       </ul>
-      {/*lift(countP
-        .map('.completed')
-        .map(n => n > 0
-          ? <button className="clear-completed" onClick={clear}>Clear completed</button>
-          : null
-        )
-      )*/}
+      {lift(S.map(todos => (todos.completed > 0
+        ? <button className="clear-completed" onClick={clear}>Clear completed</button>
+        : null
+      ), countS))}
     </footer>
   )
 }
