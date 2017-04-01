@@ -57,8 +57,10 @@ export const freeze = stream => {
   }
 }
 
-export const fromPromise = promise => sink =>
+export const fromPromise = promise => sink => {
   promise.then(sink)
+  return () => {}
+}
 
 export const fromEvent = (element, event) => sink => {
   element.addEventListener(event, sink)
