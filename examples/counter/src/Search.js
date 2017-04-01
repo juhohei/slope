@@ -10,7 +10,7 @@ export default function Counter () {
     <div>
       <input onChange={e => search(e.target.value)}/>
       <div>
-        {lift(S.map(json => <pre>{JSON.stringify(json)}</pre>, searchResults))}
+        {lift(searchResults)}
       </div>
     </div>
   )
