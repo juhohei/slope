@@ -2,7 +2,7 @@ export const combine = (fn, streams) => sink => {
   let values   = []
   let seen     = []
   let seenAll  = false
-  return unsubAll(streams.map((stream, i) => stream(value => {
+  return unsubscribeAll(streams.map((stream, i) => stream(value => {
     values[i] = value
     if (seenAll) {
       sink(fn(...values))
@@ -46,7 +46,7 @@ export const map = (fn, stream) => sink =>
 
 export const mapStream = (valueStream, triggerStream) => sink => {
   let payload
-  return unsubAll([
+  return unsubscribeAll([
     valueStream(value => payload = value),
     triggerStream(() => sink(payload))
   ])
@@ -79,7 +79,7 @@ export const startWith = (initial, stream) => sink => {
 export const update = (initial, ...pairs) => sink => {
   let payload = initial
   sink(payload)
-  return unsubAll(pairs.map(pair => {
+  return unsubscribeAll(pairs.map(pair => {
     const [stream, fn] = pair
     return stream(value => {
       payload = fn(payload, value)
@@ -88,7 +88,7 @@ export const update = (initial, ...pairs) => sink => {
   }))
 }
 
-function unsubAll (subscirbers) {
-  return () => subscirbers.forEach(unsub => unsub())
+function unsubscribeAll (subscribers) {
+  return () => subscribers.forEach(unsubscribe => unsubscribe())
 }
 
