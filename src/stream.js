@@ -76,6 +76,9 @@ export const mapStream = (valueStream, triggerStream) => sink => {
   ])
 }
 
+export const merge = streams => sink =>
+  unsubscribeAll(streams.map(stream => stream(sink)))
+
 export const scan = (fn, initial, stream) => sink => {
   let payload = initial
   sink(payload)
