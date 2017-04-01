@@ -2,19 +2,19 @@ export const combine = (fn, streams) => sink => {
   let values   = []
   let seen     = []
   let seenAll  = false
-  const subscribers = streams.map((stream, i) => stream(value => {
+  return unsubAll(streams.map((stream, i) => stream(value => {
     values[i] = value
     if (seenAll) {
       sink(fn(...values))
     } else {
       seen[i] = true
       if (seen.filter(x => x).length === streams.length) {
-        seenAll = true
         sink(fn(...values))
+        seenAll = true
+        seen    = null
       }
     }
-  }))
-  return () => subscribers.forEach(unsub => unsub())
+  })))
 }
 
 export const doAction = (fn, stream) => sink =>
@@ -44,14 +44,12 @@ export const fromEvent = (element, event) => sink => {
 export const map = (fn, stream) => sink =>
   stream(value => sink(fn(value)))
 
-export const mapStream = (valueStream, targetStream) => sink => {
+export const mapStream = (valueStream, triggerStream) => sink => {
   let payload
-  const unsub1 = valueStream(value => payload = value)
-  const unsub2 = targetStream(() => sink(payload))
-  return () => {
-    unsub1()
-    unsub2()
-  }
+  return unsubAll([
+    valueStream(value => payload = value),
+    triggerStream(() => sink(payload))
+  ])
 }
 
 export const scan = (fn, initial, stream) => sink => {
@@ -81,13 +79,16 @@ export const startWith = (initial, stream) => sink => {
 export const update = (initial, ...pairs) => sink => {
   let payload = initial
   sink(payload)
-  const subscirbers = pairs.map(pair => {
+  return unsubAll(pairs.map(pair => {
     const [stream, fn] = pair
     return stream(value => {
       payload = fn(payload, value)
       sink(payload)
     })
-  })
+  }))
+}
+
+function unsubAll (subscirbers) {
   return () => subscirbers.forEach(unsub => unsub())
 }
 
