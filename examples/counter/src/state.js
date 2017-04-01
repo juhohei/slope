@@ -2,8 +2,10 @@ import {S} from '../../..'
 
 import * as actions from './actions'
 
-export const counter = S.scan((p, n) => p + n, 0, actions.count.stream)
-export const clicks  = S.scan(p => p + 1, 0, actions.count.stream)
+const countS = S.fork(actions.count.stream)
+
+export const counter = S.scan((p, n) => p + n, 0, countS)
+export const clicks  = S.scan(p => p + 1, 0, countS)
 
 export const searchResults = S.map(
   value => value.length > 3 ? value : null,

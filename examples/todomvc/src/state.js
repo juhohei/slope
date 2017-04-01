@@ -21,7 +21,7 @@ const addTodoS = S.map(title => ({id: ++id, title, completed: false}),
   )
 )
 
-const routeS = S.freeze(S.map(getPropsForRoute,
+const routeS = S.fork(S.map(getPropsForRoute,
   S.startWith(location.hash,
     S.doAction(route => history.pushState(null, '', route), actions.navigate.stream)
   )
@@ -32,7 +32,7 @@ export const currentFilterS = S.map(route => route.filter, routeS)
 export const currentRouteS  = S.map(route => route.route, routeS)
 
 
-const allTodosS = S.freeze(S.update([{id: -1, title: 'test', completed: true}],
+const allTodosS = S.fork(S.update([{id: -1, title: 'test', completed: true}],
   [addTodoS,   (todos, todo) => todos.concat(todo)],
   [toggleS,    (todos, id)   => todos.map(todo => todo.id === id ? assign(todo, {completed: !todo.completed}): todo)],
   [delS,       (todos, id)   => todos.filter(todo => todo.id !== id)],
@@ -45,7 +45,7 @@ export const todosS = S.combine((todos, filter) => todos.filter(filter), [
   currentFilterS
 ])
 
-export const countS = S.freeze(S.map(todos => {
+export const countS = S.fork(S.map(todos => {
   const remaining = todos.reduce((count, todo) => count + (todo.completed ? 0 : 1), 0)
   return {
     remaining,

@@ -1,18 +1,22 @@
 export function Action () {
-  let sinks = []
+  let sink = null
 
   const action = value => {
-    if (sinks.length) {
-      sinks.forEach(sink => sink(value))
+    if (sink) {
+      sink(value)
     }
   }
 
-  action.stream = sink => {
-    sinks.push(sink)
+  action.stream = subscriber => {
+    if (sink) {
+      throw new Error('This stream has already been subscribed to. Use `fork` to allow more subscribers.')
+    }
+    sink = subscriber
     return () => {
-      sinks.splice(sinks.indexOf(sink), 1)
+      sink = null
     }
   }
 
   return action
 }
+

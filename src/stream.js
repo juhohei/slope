@@ -33,7 +33,7 @@ export const filter = (fn, stream) => sink =>
 export const flatMap = (fn, stream) => sink =>
   stream(value => fn(value)(sink))
 
-export const freeze = stream => {
+export const fork = stream => {
   let sinks = []
   let initial
   const unsubscribe = stream(value => {
