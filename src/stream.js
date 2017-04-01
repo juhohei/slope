@@ -33,6 +33,30 @@ export const filter = (fn, stream) => sink =>
 export const flatMap = (fn, stream) => sink =>
   stream(value => fn(value)(sink))
 
+export const freeze = stream => {
+  let sinks = []
+  let initial
+  const unsubscribe = stream(value => {
+    if (sinks.length) {
+      sinks.forEach(sink => sink(value))
+    } else {
+      initial = value
+    }
+  })
+  return sink => {
+    if (initial) {
+      sink(initial)
+    }
+    sinks.push(sink)
+    return () => {
+      sinks.splice(sinks.indexOf(sink), 1)
+      if (!sinks.length) {
+        unsubscribe()
+      }
+    }
+  }
+}
+
 export const fromPromise = promise => sink =>
   promise.then(sink)
 
