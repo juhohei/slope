@@ -81,7 +81,7 @@ export function from<T>(value: T): Stream<T> {
   return (sink, end = noop) => {
     sink(value)
     end()
-    return () => {}
+    return noop
   }
 }
 
@@ -89,7 +89,7 @@ export function fromArray<T>(arr: Array<T>): Stream<T> {
   return (sink, end = noop) => {
     arr.forEach(value => sink(value))
     end()
-    return () => {}
+    return noop
   }
 }
 
@@ -99,7 +99,7 @@ export function fromPromise<T>(promise: Promise<T>): Stream<T> {
       sink(value)
       end()
     })
-    return () => {}
+    return noop
   }
 }
 
