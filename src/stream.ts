@@ -62,6 +62,20 @@ export function fork<T>(stream: Stream<T>): Stream<T> {
   }
 }
 
+export function from<T>(value: T): Stream<T> {
+  return sink => {
+    sink(value)
+    return () => {}
+  }
+}
+
+export function fromArray<T>(arr: Array<T>): Stream<T> {
+  return sink => {
+    arr.forEach(sink)
+    return () => {}
+  }
+}
+
 export function fromPromise<T>(promise: Promise<T>): Stream<T> {
   return sink => {
     promise.then(sink)
