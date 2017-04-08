@@ -5,7 +5,7 @@ export interface Action<T> {
 
 export type BinaryF<A, B, C> = (a: A, b: B) => C
 
-export type Noop = () => void
+type Noop = () => void
 
 export type Stream<T> = (subscriber: Subscriber<T>, end?: Noop) => Unsubscribe
 

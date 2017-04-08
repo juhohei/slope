@@ -1,4 +1,8 @@
-import {Noop} from '../types'
+import {Unsubscribe} from '../types'
 
-export const noop: Noop = () => {}
+export function noop(): void {}
+
+export function unsubscribeAll(subscribers: Array<Unsubscribe>): Unsubscribe {
+  return () => subscribers.forEach((unsubscribe: Unsubscribe) => unsubscribe())
+}
 

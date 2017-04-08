@@ -1,4 +1,4 @@
-import {noop} from './util'
+import {noop, unsubscribeAll} from './util'
 
 import {BinaryF, Stream, Subscriber, UnaryF, Unsubscribe} from '../types'
 
@@ -165,6 +165,3 @@ export const update = (initial, ...pairs) => sink => {
   }))
 }
 
-function unsubscribeAll(subscribers: Array<Unsubscribe>): Unsubscribe {
-  return () => subscribers.forEach((unsubscribe: Unsubscribe) => unsubscribe())
-}
