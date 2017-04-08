@@ -1,5 +1,7 @@
 import * as React from 'react'
 
+import {noop} from './util'
+
 import {Stream, Unsubscribe} from '../types'
 
 interface Props<T> {
@@ -19,7 +21,7 @@ class Observable<T> extends React.Component<Props<T>, State<T>>{
   }
 
   componentWillMount () {
-    this.unsubscribe = this.props.stream(value => this.setState({value}))
+    this.unsubscribe = this.props.stream(value => this.setState({value}), noop)
   }
 
   componentWillUnmount () {
