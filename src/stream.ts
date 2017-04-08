@@ -27,18 +27,24 @@ export function combine(fn: NAryF): (streams: Array<Stream<any>>) => Stream<any>
 }
 
 export function doAction<T>(fn: UnaryF<T, void>): (stream: Stream<T>) => Stream<T> {
-  return stream => sink => stream(value => {
-    fn(value)
-    sink(value)
-  })
+  return stream => (sink, end) => stream(
+    value => {
+      fn(value)
+      sink(value)
+    },
+    end
+  )
 }
 
 export function filter<T>(fn: UnaryF<T, boolean>): (stream: Stream<T>) => Stream<T> {
-  return stream => sink => stream(value => {
-    if (fn(value)) {
-      sink(value)
-    }
-  })
+  return stream => (sink, end) => stream(
+    value => {
+      if (fn(value)) {
+        sink(value)
+      }
+    },
+    end
+  )
 }
 
 export function flatMap<A, B>(fn: UnaryF<A, Stream<B>>): (stream: Stream<A>) => Stream<B> {
@@ -111,7 +117,10 @@ export function fromEvent(element: HTMLElement, event: string): Stream<Event> {
 }
 
 export function map<A, B>(fn: UnaryF<A, B>): (stream: Stream<A>) => Stream<B> {
-  return stream => sink => stream(value => sink(fn(value)))
+  return stream => (sink, end) => stream(
+    value => sink(fn(value)),
+    end
+  )
 }
 
 export function mapStream<A, B>(valueStream: Stream<A>, triggerStream: Stream<B>): Stream<A> {
@@ -123,38 +132,44 @@ export function mapStream<A, B>(valueStream: Stream<A>, triggerStream: Stream<B>
 }
 
 export function merge(streams: Array<Stream<any>>): Stream<any> {
-  return sink => unsubscribeAll(streams.map(stream => stream(sink)))
+  return (sink, end) => unsubscribeAll(streams.map(stream => stream(sink, end)))
 }
 
 export function pipe(fns: Array<(s: Stream<any>) => Stream<any>>): (stream: Stream<any>) => Stream<any> {
-  return stream => sink => fns.reduce((s, fn) => fn(s), stream)(value => sink(value))
+  return stream => (sink, end) => fns.reduce((s, fn) => fn(s), stream)(value => sink(value), end)
 }
 
 export function scan<A, B>(fn: BinaryF<B, A, B>, initial: B): (stream: Stream<A>) => Stream<B> {
   let payload: B = initial
-  return stream => sink => {
+  return stream => (sink, end) => {
     sink(payload)
-    return stream(value => {
-      payload = fn(payload, value)
-      sink(payload)
-    })
+    return stream(
+      value => {
+        payload = fn(payload, value)
+        sink(payload)
+      },
+      end
+    )
   }
 }
 
 export function skipDuplicates<T>(fn: BinaryF<T, T, boolean>): (stream: Stream<T>) => Stream<T> {
   let previous: T
-  return stream => sink => stream(value => {
-    if (!fn(previous, value)) {
-      sink(value)
-    }
-    previous = value
-  })
+  return stream => (sink, end) => stream(
+    value => {
+      if (!fn(previous, value)) {
+        sink(value)
+      }
+      previous = value
+    },
+    end
+  )
 }
 
 export function startWith<T>(initial: T): (stream: Stream<T>) => Stream<T> {
-  return stream => sink => {
+  return stream => (sink, end) => {
     sink(initial)
-    return stream(sink)
+    return stream(sink, end)
   }
 }
 
