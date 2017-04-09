@@ -2,28 +2,35 @@ import {noop, unsubscribeAll} from './util'
 
 import {BinaryF, Stream, Subscriber, UnaryF, Unsubscribe} from '../types'
 
-export function combine(fn: UnaryF<Array<any>, any>): (streams: Array<Stream<any>>) => Stream<any> {
-  return streams => (sink, end) => {
-    const values: Array<any>   = []
-    let seen: Array<boolean>   = []
-    let seenAll: boolean       = false
-    return unsubscribeAll(streams.map((stream, i) => stream(
+export function combine(aStream: Stream<any>, bStream: Stream<any>): Stream<Array<any>> {
+  return (sink, end) => {
+    let latestA: any
+    let latestB: any
+    const push = () => {
+      if (latestA && latestB) {
+        sink([].concat(latestA, latestB))
+      }
+    }
+    const unsubscribeA = aStream(
       value => {
-        values[i] = value
-        if (seenAll) {
-          sink(fn(values))
-        } else {
-          seen[i] = true
-          if (seen.filter(x => x).length === streams.length) {
-            sink(fn(values))
-            seenAll = true
-            seen    = null
-          }
-        }
+        latestA = value
+        push()
+      }
+    )
+    const unsubscribeB = bStream(
+      value => {
+        latestB = value
+        push()
       },
       end
-    )))
+    )
+
+    return unsubscribeAll([unsubscribeA, unsubscribeB])
   }
+}
+
+export function combineAll(streams: Array<Stream<any>>): Stream<Array<any>> {
+  return streams.reduce(combine, from([]))
 }
 
 export function doAction<T>(fn: UnaryF<T, void>): (stream: Stream<T>) => Stream<T> {
@@ -150,7 +157,7 @@ export function map<A, B>(fn: UnaryF<A, B>): (stream: Stream<A>) => Stream<B> {
 }
 
 export function merge(streams: Array<Stream<any>>): Stream<any> {
-  return flatMap(stream => stream)(fromArray(streams))
+  return flatMap<Stream<any>, Stream<any>>(stream => stream)(fromArray(streams))
 }
 
 export function pipe(fns: Array<(s: Stream<any>) => Stream<any>>): (stream: Stream<any>) => Stream<any> {
