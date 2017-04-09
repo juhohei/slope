@@ -1,21 +1,21 @@
 import {noop, unsubscribeAll} from './util'
 
-import {BinaryF, NAryF, Stream, Subscriber, UnaryF, Unsubscribe} from '../types'
+import {BinaryF, Stream, Subscriber, UnaryF, Unsubscribe} from '../types'
 
-export function combine(fn: NAryF): (streams: Array<Stream<any>>) => Stream<any> {
+export function combine(fn: UnaryF<Array<any>, any>): (streams: Array<Stream<any>>) => Stream<any> {
   return streams => (sink, end) => {
-    const values: Array<any> = []
-    let seen: Array<boolean> = []
-    let seenAll: boolean     = false
+    const values: Array<any>   = []
+    const seen: Array<boolean> = []
+    let seenAll: boolean       = false
     return unsubscribeAll(streams.map((stream, i) => stream(
       value => {
         values[i] = value
         if (seenAll) {
-          sink(fn(...values))
+          sink(fn(values))
         } else {
           seen[i] = true
           if (seen.filter(x => x).length === streams.length) {
-            sink(fn(...values))
+            sink(fn(values))
             seenAll = true
             seen    = null
           }
