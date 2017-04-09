@@ -5,7 +5,7 @@ import {BinaryF, Stream, Subscriber, UnaryF, Unsubscribe} from '../types'
 export function combine(fn: UnaryF<Array<any>, any>): (streams: Array<Stream<any>>) => Stream<any> {
   return streams => (sink, end) => {
     const values: Array<any>   = []
-    const seen: Array<boolean> = []
+    let seen: Array<boolean>   = []
     let seenAll: boolean       = false
     return unsubscribeAll(streams.map((stream, i) => stream(
       value => {
@@ -171,17 +171,5 @@ export function startWith<T>(initial: T): (stream: Stream<T>) => Stream<T> {
     sink(initial)
     return stream(sink, end)
   }
-}
-
-export const update = (initial, ...pairs) => sink => {
-  let payload = initial
-  sink(payload)
-  return unsubscribeAll(pairs.map(pair => {
-    const [stream, fn] = pair
-    return stream(value => {
-      payload = fn(payload, value)
-      sink(payload)
-    })
-  }))
 }
 
