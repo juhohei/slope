@@ -33,16 +33,6 @@ export function combineAll(streams: Array<Stream<any>>): Stream<Array<any>> {
   return streams.reduce(combine, from([]))
 }
 
-export function doAction<T>(fn: UnaryF<T, void>): (stream: Stream<T>) => Stream<T> {
-  return stream => (sink, end) => stream(
-    value => {
-      fn(value)
-      sink(value)
-    },
-    end
-  )
-}
-
 export function filter<T>(fn: UnaryF<T, boolean>): (stream: Stream<T>) => Stream<T> {
   return stream => (sink, end) => stream(
     value => {
@@ -204,5 +194,12 @@ export function startWith<T>(initial: T): (stream: Stream<T>) => Stream<T> {
     sink(initial)
     return stream(sink, end)
   }
+}
+
+export function tap<T>(fn: UnaryF<T, void>): (stream: Stream<T>) => Stream<T> {
+  return map<T, T>(value => {
+    fn(value)
+    return value
+  })
 }
 
