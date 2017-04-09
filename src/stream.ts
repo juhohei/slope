@@ -125,6 +125,13 @@ export function fromArray<T>(arr: Array<T>): Stream<T> {
   }
 }
 
+export function fromEvent(element: HTMLElement, event: string): Stream<Event> {
+  return sink => {
+    element.addEventListener(event, sink)
+    return () => element.removeEventListener(event, sink)
+  }
+}
+
 export function fromPromise<T>(promise: Promise<T>): Stream<T> {
   return (sink, end = noop) => {
     promise.then(value => {
@@ -135,13 +142,6 @@ export function fromPromise<T>(promise: Promise<T>): Stream<T> {
   }
 }
 
-export function fromEvent(element: HTMLElement, event: string): Stream<Event> {
-  return sink => {
-    element.addEventListener(event, sink)
-    return () => element.removeEventListener(event, sink)
-  }
-}
-
 export function map<A, B>(fn: UnaryF<A, B>): (stream: Stream<A>) => Stream<B> {
   return stream => (sink, end) => stream(
     value => sink(fn(value)),
@@ -149,20 +149,20 @@ export function map<A, B>(fn: UnaryF<A, B>): (stream: Stream<A>) => Stream<B> {
   )
 }
 
-export function mapStream<A, B>(valueStream: Stream<A>, triggerStream: Stream<B>): Stream<A> {
-  let payload: A
-  return (sink, end) => unsubscribeAll([
-    valueStream(value => payload = value, end),
-    triggerStream(() => sink(payload), end)
-  ])
-}
-
 export function merge(streams: Array<Stream<any>>): Stream<any> {
-  return (sink, end) => unsubscribeAll(streams.map(stream => stream(sink, end)))
+  return flatMap(stream => stream)(fromArray(streams))
 }
 
 export function pipe(fns: Array<(s: Stream<any>) => Stream<any>>): (stream: Stream<any>) => Stream<any> {
   return stream => (sink, end) => fns.reduce((s, fn) => fn(s), stream)(value => sink(value), end)
+}
+
+export function sample<A, B>(stream: Stream<A>, sampler: Stream<B>): Stream<A> {
+  let payload: A
+  return (sink, end) => unsubscribeAll([
+    stream(value => payload = value, end),
+    sampler(() => sink(payload), end)
+  ])
 }
 
 export function scan<A, B>(fn: BinaryF<B, A, B>, initial: B): (stream: Stream<A>) => Stream<B> {
