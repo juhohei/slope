@@ -48,10 +48,36 @@ export function filter<T>(fn: UnaryF<T, boolean>): (stream: Stream<T>) => Stream
 }
 
 export function flatMap<A, B>(fn: UnaryF<A, Stream<B>>): (stream: Stream<A>) => Stream<B> {
-  return stream => (sink, end) => stream(
-    value => fn(value)(sink, end),
-    end
-  )
+  return stream => (sink, end) => {
+    const unsubscribeFns: Array<Unsubscribe> = []
+    const unsubscribe = stream(
+      value => {
+        unsubscribeFns.push(fn(value)(sink))
+      },
+      end
+    )
+    return () => {
+      unsubscribeAll(unsubscribeFns)()
+      unsubscribe()
+    }
+  }
+}
+
+export function flatMapLatest<A, B>(fn: UnaryF<A, Stream<B>>): (stream: Stream<A>) => Stream<B> {
+  return stream => (sink, end) => {
+    let unsubscribePrevious: Unsubscribe = noop
+    const unsubscribe = stream(
+      value => {
+        unsubscribePrevious()
+        unsubscribePrevious = fn(value)(sink)
+      },
+      end
+    )
+    return () => {
+      unsubscribePrevious()
+      unsubscribe()
+    }
+  }
 }
 
 export function fork<T>(stream: Stream<T>): Stream<T> {
