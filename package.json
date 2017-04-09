@@ -1,5 +1,5 @@
 {
-  "name": "streams",
+  "name": "slope",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/juhohei/streams.git"
+    "url": "git+https://github.com/juhohei/slope.git"
   },
   "author": "Juho Heinisuo <juho.heinisuo@iki.fi>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/juhohei/streams/issues"
+    "url": "https://github.com/juhohei/slope/issues"
   },
-  "homepage": "https://github.com/juhohei/streams#readme",
+  "homepage": "https://github.com/juhohei/slope#readme",
   "dependencies": {
     "react": "^15.4.2",
     "typescript": "^2.2.2"
