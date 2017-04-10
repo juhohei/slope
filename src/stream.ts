@@ -53,10 +53,7 @@ export function flatMap<A, B>(fn: UnaryF<A, Stream<B>>): (stream: Stream<A>) => 
       },
       end
     )
-    return () => {
-      unsubscribeAll(unsubscribeFns)()
-      unsubscribe()
-    }
+    return unsubscribeAll(unsubscribeFns.concat(unsubscribe))
   }
 }
 
@@ -131,10 +128,7 @@ export function fromEvent(element: HTMLElement, event: string): Stream<Event> {
 
 export function fromPromise<T>(promise: Promise<T>): Stream<T> {
   return (sink, end = noop) => {
-    promise.then(value => {
-      sink(value)
-      end()
-    })
+    promise.then(sink).then(end)
     return noop
   }
 }
@@ -151,20 +145,22 @@ export function merge(streams: Array<Stream<any>>): Stream<any> {
 }
 
 export function pipe(fns: Array<(s: Stream<any>) => Stream<any>>): (stream: Stream<any>) => Stream<any> {
-  return stream => (sink, end) => fns.reduce((s, fn) => fn(s), stream)(value => sink(value), end)
+  return stream => fns.reduce((s, fn) => fn(s), stream)
 }
 
 export function sample<A, B>(stream: Stream<A>, sampler: Stream<B>): Stream<A> {
-  let payload: A
-  return (sink, end) => unsubscribeAll([
-    stream(value => payload = value, end),
-    sampler(() => sink(payload), end)
-  ])
+  return (sink, end) => {
+    let payload: A
+    return unsubscribeAll([
+      stream(value => payload = value),
+      sampler(() => sink(payload), end)
+    ])
+  }
 }
 
 export function scan<A, B>(fn: BinaryF<B, A, B>, initial: B): (stream: Stream<A>) => Stream<B> {
-  let payload: B = initial
   return stream => (sink, end) => {
+    let payload: B = initial
     sink(payload)
     return stream(
       value => {
@@ -177,16 +173,18 @@ export function scan<A, B>(fn: BinaryF<B, A, B>, initial: B): (stream: Stream<A>
 }
 
 export function skipDuplicates<T>(fn: BinaryF<T, T, boolean>): (stream: Stream<T>) => Stream<T> {
-  let previous: T
-  return stream => (sink, end) => stream(
-    value => {
-      if (!fn(previous, value)) {
-        sink(value)
-      }
-      previous = value
-    },
-    end
-  )
+  return stream => (sink, end) => {
+    let previous: T
+    return stream(
+      value => {
+        if (!fn(previous, value)) {
+          sink(value)
+        }
+        previous = value
+      },
+      end
+    )
+  }
 }
 
 export function startWith<T>(initial: T): (stream: Stream<T>) => Stream<T> {
