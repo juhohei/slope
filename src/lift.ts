@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {noop} from './util'
 
-import {Stream, Unsubscribe} from '../types'
+import {Stream, Unsubscribe} from '../index'
 
 interface Props<T> {
   stream: Stream<T>

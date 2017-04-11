@@ -1,11 +1,13 @@
 {
   "name": "slope",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/index",
+  "types": "./dist/index",
   "scripts": {
     "build": "tsc --project tsconfig.json",
-    "lint": "tslint -c tslint.json index.ts"
+    "lint": "tslint -c tslint.json index.ts",
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -29,5 +31,10 @@
     "babel-preset-react": "^6.23.0",
     "babelify": "^7.3.0",
     "tslint": "^5.0.0"
-  }
+  },
+  "files": [
+    "LICENSE",
+    "dist",
+    "index.d.ts"
+  ]
 }

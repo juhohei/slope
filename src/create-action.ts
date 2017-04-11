@@ -1,4 +1,4 @@
-import {Action, Stream, Subscriber, Unsubscribe} from '../types'
+import {Action, Stream, Subscriber, Unsubscribe} from '../index'
 
 export function Action<T>(): Action<T> {
   let sink: Subscriber<T> = null

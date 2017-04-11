@@ -1,6 +1,6 @@
 import {noop, unsubscribeAll} from './util'
 
-import {BinaryF, Stream, Subscriber, UnaryF, Unsubscribe} from '../types'
+import {BinaryF, Stream, Subscriber, UnaryF, Unsubscribe} from '../index'
 
 export function combine(aStream: Stream<any>, bStream: Stream<any>): Stream<Array<any>> {
   return (sink, end) => {
@@ -91,7 +91,7 @@ export function fork<T>(stream: Stream<T>): Stream<T> {
 
   return (sink, end = noop) => {
     if (passed.length) {
-      fromArray(passed)(sink, end)
+      fromArray<T>(passed)(sink, end)
     }
     sinks.push(sink)
     return () => {
@@ -141,7 +141,7 @@ export function map<A, B>(fn: UnaryF<A, B>): (stream: Stream<A>) => Stream<B> {
 }
 
 export function merge(streams: Array<Stream<any>>): Stream<any> {
-  return flatMap<Stream<any>, Stream<any>>(stream => stream)(fromArray(streams))
+  return flatMap<Stream<any>, Stream<any>>(stream => stream)(fromArray<any>(streams))
 }
 
 export function pipe(fns: Array<(s: Stream<any>) => Stream<any>>): (stream: Stream<any>) => Stream<any> {

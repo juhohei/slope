@@ -1,6 +1,4 @@
 node_modules
-build
-npm-debug.log
-*.min.*
 npm-debug.log*
 perf
+dist

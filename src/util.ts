@@ -1,4 +1,4 @@
-import {Unsubscribe} from '../types'
+import {Unsubscribe} from '../index'
 
 export function noop(): void {}
 
