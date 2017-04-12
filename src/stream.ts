@@ -32,7 +32,11 @@ export function flatMap<A, B>(fn: UnaryF<A, Stream<B>>): (stream: Stream<A>) => 
         }))
       },
       () => {
-        isLastStream = true
+        if (receivedValues === passedValues) {
+          end()
+        } else {
+          isLastStream = true
+        }
       }
     )
     return unsubscribeAll(unsubscribeFns.concat(unsubscribe))
@@ -57,7 +61,11 @@ export function flatMapLatest<A, B>(fn: UnaryF<A, Stream<B>>): (stream: Stream<A
         })
       },
       () => {
-        isLastStream = true
+        if (receivedValues === passedValues) {
+          end()
+        } else {
+          isLastStream = true
+        }
       }
     )
     return () => {
