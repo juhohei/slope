@@ -1,33 +1,4 @@
-import {noop, unsubscribeAll} from './util'
-
 import {BinaryF, Stream, Subscriber, UnaryF, Unsubscribe} from '../index'
-
-function _combine(aStream: Stream<any>, bStream: Stream<any>): Stream<Array<any>> {
-  return (sink, end) => {
-    let latestA: any
-    let latestB: any
-    const push = () => {
-      if (latestA && latestB) {
-        sink([].concat(latestA, latestB))
-      }
-    }
-    const unsubscribeA = aStream(
-      value => {
-        latestA = value
-        push()
-      }
-    )
-    const unsubscribeB = bStream(
-      value => {
-        latestB = value
-        push()
-      },
-      end
-    )
-
-    return unsubscribeAll([unsubscribeA, unsubscribeB])
-  }
-}
 
 export function combine(streams: Array<Stream<any>>): Stream<Array<any>> {
   return streams.reduce(_combine, from([]))
@@ -230,5 +201,38 @@ export function tap<T>(fn: UnaryF<T, void>): (stream: Stream<T>) => Stream<T> {
     fn(value)
     return value
   })
+}
+
+function _combine(aStream: Stream<any>, bStream: Stream<any>): Stream<Array<any>> {
+  return (sink, end) => {
+    let latestA: any
+    let latestB: any
+    const push = () => {
+      if (latestA && latestB) {
+        sink([].concat(latestA, latestB))
+      }
+    }
+    const unsubscribeA = aStream(
+      value => {
+        latestA = value
+        push()
+      }
+    )
+    const unsubscribeB = bStream(
+      value => {
+        latestB = value
+        push()
+      },
+      end
+    )
+
+    return unsubscribeAll([unsubscribeA, unsubscribeB])
+  }
+}
+
+function noop(): void {}
+
+function unsubscribeAll(subscribers: Array<Unsubscribe>): Unsubscribe {
+  return () => subscribers.forEach((unsubscribe: Unsubscribe) => unsubscribe())
 }
 
