@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "lint": "tslint -c tslint.json index.ts",
-    "prepublish": "npm run build",
+    "prepublish": "npm test",
     "pretest": "npm run build",
     "test": "mocha --recursive ./dist/test"
   },
