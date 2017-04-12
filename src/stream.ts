@@ -45,27 +45,49 @@ export function filter<T>(fn: UnaryF<T, boolean>): (stream: Stream<T>) => Stream
 }
 
 export function flatMap<A, B>(fn: UnaryF<A, Stream<B>>): (stream: Stream<A>) => Stream<B> {
-  return stream => (sink, end) => {
+  return stream => (sink, end = noop) => {
     const unsubscribeFns: Array<Unsubscribe> = []
+    let isLastStream: boolean  = false
+    let receivedValues: number = 0
+    let passedValues: number   = 0
     const unsubscribe = stream(
       value => {
-        unsubscribeFns.push(fn(value)(sink))
+        receivedValues++
+        unsubscribeFns.push(fn(value)(sink, () => {
+          passedValues++
+          if (isLastStream && receivedValues === passedValues) {
+            end()
+          }
+        }))
       },
-      end
+      () => {
+        isLastStream = true
+      }
     )
     return unsubscribeAll(unsubscribeFns.concat(unsubscribe))
   }
 }
 
 export function flatMapLatest<A, B>(fn: UnaryF<A, Stream<B>>): (stream: Stream<A>) => Stream<B> {
-  return stream => (sink, end) => {
+  return stream => (sink, end = noop) => {
     let unsubscribePrevious: Unsubscribe = noop
+    let isLastStream: boolean  = false
+    let receivedValues: number = 0
+    let passedValues: number   = 0
     const unsubscribe = stream(
       value => {
+        receivedValues++
         unsubscribePrevious()
-        unsubscribePrevious = fn(value)(sink)
+        unsubscribePrevious = fn(value)(sink, () => {
+          passedValues++
+          if (isLastStream && receivedValues === passedValues) {
+            end()
+          }
+        })
       },
-      end
+      () => {
+        isLastStream = true
+      }
     )
     return () => {
       unsubscribePrevious()
@@ -128,8 +150,17 @@ export function fromEvent(element: HTMLElement, event: string): Stream<Event> {
 
 export function fromPromise<T>(promise: Promise<T>): Stream<T> {
   return (sink, end = noop) => {
-    promise.then(sink).then(end)
-    return noop
+    let cancelled: boolean = false
+    promise.then(value => {
+      if (!cancelled) {
+        sink(value)
+      }
+      end()
+    })
+
+    return () => {
+      cancelled = true
+    }
   }
 }
 
