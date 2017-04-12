@@ -2,10 +2,10 @@
   "name": "slope",
   "version": "0.1.0",
   "description": "",
-  "main": "./dist/index",
-  "types": "./dist/index",
+  "main": "./dist/src/index",
+  "types": "./dist/src/index",
   "scripts": {
-    "build": "tsc --project tsconfig.json",
+    "build": "rm -rf ./dist && tsc --project tsconfig.json",
     "lint": "tslint -c tslint.json index.ts",
     "prepublish": "npm test",
     "pretest": "npm run build",
