@@ -2,7 +2,7 @@ import {noop, unsubscribeAll} from './util'
 
 import {BinaryF, Stream, Subscriber, UnaryF, Unsubscribe} from '../index'
 
-export function combine(aStream: Stream<any>, bStream: Stream<any>): Stream<Array<any>> {
+function _combine(aStream: Stream<any>, bStream: Stream<any>): Stream<Array<any>> {
   return (sink, end) => {
     let latestA: any
     let latestB: any
@@ -29,8 +29,8 @@ export function combine(aStream: Stream<any>, bStream: Stream<any>): Stream<Arra
   }
 }
 
-export function combineAll(streams: Array<Stream<any>>): Stream<Array<any>> {
-  return streams.reduce(combine, from([]))
+export function combine(streams: Array<Stream<any>>): Stream<Array<any>> {
+  return streams.reduce(_combine, from([]))
 }
 
 export function filter<T>(fn: UnaryF<T, boolean>): (stream: Stream<T>) => Stream<T> {

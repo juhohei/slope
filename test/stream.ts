@@ -12,30 +12,12 @@ describe('S', () => {
 
   describe('combine', () => {
 
-    it('combines 2 streams to an stream of arrays', () => {
-      const stream1  = S.fromArray([1, 2, 3])
-      const stream2  = S.fromArray([4, 5, 6])
-      const expected = [[3, 4], [3, 5], [3, 6]]
-      S.combine(stream1, stream2)(
-        value => {
-          expect(value).to.eql(expected.shift())
-        },
-        () => {
-          expect(undefined).to.eql(expected.shift())
-        }
-      )
-    })
-
-  })
-
-  describe('combineAll', () => {
-
     it('combines an array of streams to an stream of arrays', () => {
       const stream1  = S.fromArray([1, 2, 3])
       const stream2  = S.fromArray([4, 5, 6])
       const stream3  = S.fromArray([7, 8, 9])
       const expected = [[3, 6, 7], [3, 6, 8], [3, 6, 9]]
-      S.combineAll([stream1, stream2, stream3])(
+      S.combine([stream1, stream2, stream3])(
         value => {
           expect(value).to.eql(expected.shift())
         },
