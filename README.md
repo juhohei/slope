@@ -1,6 +1,10 @@
 ## Slope
 
-Slope is a small, functional stream library.
+Slope is a small, functional reactive programming (FRP) library.
+
+With [`slope-react`](https://github.com/juhohei/slope-react) you can easily `lift` your `slope` streams into values inside `React` components - and `React` only has to diff and rerender the changed value.
+
+__Status__: Not ready for production
 
 ### Usage
 
@@ -9,10 +13,12 @@ npm i slope
 ```
 
 ```js
+// javascript
 const {S, Action} = require('slope')
 ```
 
 ```ts
+// typescript
 import {S, Action} from 'slope'
 ```
 
@@ -48,6 +54,8 @@ count(-5)
 // logs 'The current value is 5'
 unsubscribe()
 // logs 'The stream has ended'
+count(1)
+// nothing happens
 ```
 
 #### S
