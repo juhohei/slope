@@ -9,13 +9,14 @@ export function Action<T>(): Action<T> {
     }
   }) as Action<T>
 
-  action.stream = (subscriber: Subscriber<T>): Unsubscribe => {
+  action.stream = (subscriber: Subscriber<T>, end: Unsubscribe): Unsubscribe => {
     if (sink) {
       throw new Error('This stream has already been subscribed to. Use `fork` to allow more subscribers.')
     }
     sink = subscriber
     return () => {
       sink = null
+      end && end()
     }
   }
 
