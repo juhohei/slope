@@ -1,4 +1,4 @@
-import {BinaryF, Stream, Subscriber, UnaryF, Unsubscribe} from '../index'
+import {BinaryF, Noop, Stream, Subscriber, UnaryF, Unsubscribe} from './'
 
 export function combine(streams: Array<Stream<any>>): Stream<Array<any>> {
   return streams.reduce(_combine, from([]))
