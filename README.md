@@ -5,10 +5,11 @@ Slope is a small, functional reactive programming (FRP) library.
 With [`slope-react`](https://github.com/juhohei/slope-react) you can easily `lift` your `slope` streams into values inside `React` components - and `React` only has to diff and rerender the changed value.
 
 __Status__: Not ready for production
-- [] Fix `fork` - possibly allow only one subscriber / stream before fork is called
-- [] Error handling - not sure what would be the best way to implement this
-- [] Performance - not necessary, but check if `combine` could be optimized
-- [] Automatic currying - probably in the next version
+- [ ] Fix `fork` - possibly allow only one subscriber / stream before fork is called
+- [ ] Fix `combine` - it currently flattens nested arrays
+- [ ] Error handling - not sure what would be the best way to implement this
+- [ ] Performance - not necessary, but check if `combine` could be optimized
+- [ ] Automatic currying - probably in the next version
 
 ### Usage
 
