@@ -44,7 +44,7 @@ interface Action<T> {
 const {S, Action} = require('slope')
 
 const count   = Action()
-const counter = S.scan((previous, next) => previous + next, 0)(counter.stream)
+const counter = S.scan((previous, next) => previous + next, 0)(count.stream)
 
 const unsubscribe = counter(
   value => console.log(`The current value is ${value}`,
