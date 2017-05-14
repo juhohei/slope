@@ -10,6 +10,7 @@ export type Subscriber<T> = (value: T) => void
 export type UnaryF<A, B> = (a: A) => B
 export type Unsubscribe = Noop
 
+
 import * as S   from './stream'
 export {Action} from './create-action'
 export {S}

@@ -16,5 +16,18 @@ describe('Action', () => {
     push(3)
   })
 
-})
+  it('allows a single subscriber if `fork` is not called', () => {
+    const push     = Action<number>()
+    const expected = [1, 2, 3]
+    push.stream(
+      value  => {
+        expect(value).to.eql(expected.shift())
+      }
+    )
+    push(1)
+    push(2)
+    push(3)
+    expect(() => push.stream(x => x)).to.throw()
+  })
 
+})

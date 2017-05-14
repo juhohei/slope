@@ -1,5 +1,6 @@
-import {BinaryF, Bus, Noop, Stream, Subscriber, UnaryF, Unsubscribe} from './'
-import {Action} from './create-action'
+import {BinaryF, Bus, Stream, Subscriber, UnaryF, Unsubscribe} from './'
+import {Action}                                                from './create-action'
+import {noop, throwAlreadySubscribedError}                     from './util'
 
 export function combine(streams: Array<Stream<any>>): Stream<Array<any>> {
   return (sink, end = noop) => {
@@ -261,15 +262,6 @@ export function tap<T>(fn: UnaryF<T, void>): (stream: Stream<T>) => Stream<T> {
     fn(value)
     return value
   })
-}
-
-function noop(): void {}
-
-function throwAlreadySubscribedError(context: string): void {
-  throw new Error(`
-    Stream ${context} has already been subscribed to.
-    Use \`S.fork\` to allow more subscribers.
-`)
 }
 
 function unsubscribeAll(subscribers: Array<Unsubscribe>): Unsubscribe {

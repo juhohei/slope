@@ -1,4 +1,5 @@
-import {Bus, Stream, Subscriber, Unsubscribe} from './'
+import {Bus, Noop, Stream, Subscriber, Unsubscribe} from './'
+import {noop, throwAlreadySubscribedError}          from './util'
 
 export function Action<T>(): Bus<T> {
   let sink: Subscriber<T> = null
@@ -9,16 +10,14 @@ export function Action<T>(): Bus<T> {
     }
   }) as Bus<T>
 
-  action.stream = (subscriber: Subscriber<T>, end: Unsubscribe): Unsubscribe => {
+  action.stream = (subscriber: Subscriber<T>, end: Noop = noop): Unsubscribe => {
     if (sink) {
-      throw new Error('This stream has already been subscribed to. Use `fork` to allow more subscribers.')
+      throwAlreadySubscribedError(`Action()(${subscriber.toString()}, ${end.toString})`)
     }
     sink = subscriber
     return () => {
       sink = null
-      if (end) {
-        end()
-      }
+      end()
     }
   }
 
