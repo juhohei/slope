@@ -126,7 +126,14 @@ export function fork<T>(stream: Stream<T>): Stream<T> {
 }
 
 export function from<T>(value: T): Stream<T> {
+  let subscribed: boolean = false
   return (sink, end = noop) => {
+    if (subscribed) {
+      throwAlreadySubscribedError(
+        `from(${value})(${sink.toString()}, ${end.toString()})`
+      )
+    }
+    subscribed = true
     sink(value)
     end()
     return noop
@@ -134,7 +141,14 @@ export function from<T>(value: T): Stream<T> {
 }
 
 export function fromArray<T>(arr: Array<T>): Stream<T> {
+  let subscribed: boolean = false
   return (sink, end = noop) => {
+    if (subscribed) {
+      throwAlreadySubscribedError(
+        `fromArray(${JSON.stringify(arr)})(${sink.toString()}, ${end.toString()})`
+      )
+    }
+    subscribed = true
     arr.forEach(value => sink(value))
     end()
     return noop
@@ -142,7 +156,14 @@ export function fromArray<T>(arr: Array<T>): Stream<T> {
 }
 
 export function fromEvent(element: HTMLElement, event: string): Stream<Event> {
+  let subscribed: boolean = false
   return (sink, end = noop) => {
+    if (subscribed) {
+      throwAlreadySubscribedError(
+        `fromEvent(${element.nodeName}, ${event})(${sink.toString()}, ${end.toString()})`
+      )
+    }
+    subscribed = true
     element.addEventListener(event, sink)
     return () => {
       element.removeEventListener(event, sink)
@@ -152,7 +173,14 @@ export function fromEvent(element: HTMLElement, event: string): Stream<Event> {
 }
 
 export function fromPromise<T>(promise: Promise<T>): Stream<T> {
+  let subscribed: boolean = false
   return (sink, end = noop) => {
+    if (subscribed) {
+      throwAlreadySubscribedError(
+        `fromPromise(promise)(${sink.toString()}, ${end.toString()})`
+      )
+    }
+    subscribed = true
     let cancelled: boolean = false
     promise.then(value => {
       if (!cancelled) {
@@ -236,6 +264,13 @@ export function tap<T>(fn: UnaryF<T, void>): (stream: Stream<T>) => Stream<T> {
 }
 
 function noop(): void {}
+
+function throwAlreadySubscribedError(context: string): void {
+  throw new Error(`
+    Stream ${context} has already been subscribed to.
+    Use \`S.fork\` to allow more subscribers.
+`)
+}
 
 function unsubscribeAll(subscribers: Array<Unsubscribe>): Unsubscribe {
   return () => subscribers.forEach((unsubscribe: Unsubscribe) => unsubscribe())

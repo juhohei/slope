@@ -106,8 +106,8 @@ describe('S', () => {
 
 
     it('flattens a stream of streams of values to a stream of values of the latest stream (async)', done => {
-      const stream   = S.fromArray([3, 2, 1])
-      const expected = [1]
+      const stream   = S.fromArray([1, 2, 1])
+      const expected = [1, 1]
       S.flatMapLatest<number, number>(delayedStream)(stream)(
         value => {
           expect(value).to.eql(expected.shift())
@@ -120,9 +120,7 @@ describe('S', () => {
 
   describe('fork', () => {
 
-    // TODO: This is incorrect. Streams allow n subscribers, but
-    // will recalculate all values without fork
-    it('allows multiple listeners to a stream', () => {
+    it('allows multiple subscribers to a stream', () => {
       const stream    = S.fork(S.fromArray([1, 2, 3]))
       const expected1 = [1, 2, 3]
       const expected2 = [1, 2, 3]
@@ -161,6 +159,20 @@ describe('S', () => {
       )
     })
 
+    it('allows a single subsriber to a stream if `fork` is not called', () => {
+      const stream   = S.from(1)
+      const expected = [1]
+      stream(
+        value => {
+          expect(value).to.eql(expected.shift())
+        },
+        () => {
+          expect(undefined).to.eql(expected.shift())
+        }
+      )
+      expect(() => stream(x => x)).to.throw()
+    })
+
   })
 
   describe('fromArray', () => {
@@ -178,6 +190,20 @@ describe('S', () => {
       )
     })
 
+    it('allows a single subsriber to a stream if `fork` is not called', () => {
+      const stream   = S.fromArray([1, 2, 3])
+      const expected = [1, 2, 3]
+      stream(
+        value => {
+          expect(value).to.eql(expected.shift())
+        },
+        () => {
+          expect(undefined).to.eql(expected.shift())
+        }
+      )
+      expect(() => stream(x => x)).to.throw()
+    })
+
   })
 
   describe('fromPromise', () => {
@@ -191,6 +217,20 @@ describe('S', () => {
         },
         done
       )
+    })
+
+    it('allows a single subsriber to a stream if `fork` is not called', () => {
+      const stream   = S.fromPromise(Promise.resolve(1))
+      const expected = [1]
+      stream(
+        value => {
+          expect(value).to.eql(expected.shift())
+        },
+        () => {
+          expect(undefined).to.eql(expected.shift())
+        }
+      )
+      expect(() => stream(x => x)).to.throw()
     })
 
   })
