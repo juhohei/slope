@@ -1,5 +1,5 @@
-import {expect}      from 'chai'
-import {S}           from '../src'
+import {expect} from 'chai'
+import {S}      from '../src'
 
 
 const delayedPromise = (x: number) => new Promise(resolve => {

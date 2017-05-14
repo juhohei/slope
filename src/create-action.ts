@@ -16,7 +16,9 @@ export function Action<T>(): Bus<T> {
     sink = subscriber
     return () => {
       sink = null
-      end && end()
+      if (end) {
+        end()
+      }
     }
   }
 

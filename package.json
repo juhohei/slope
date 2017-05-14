@@ -5,11 +5,14 @@
   "main": "./dist/index",
   "types": "./dist/index",
   "scripts": {
-    "build": "rm -rf ./dist && tsc --project tsconfig.json",
-    "lint": "tslint -c tslint.json index.ts",
+    "build": "tsc --project tsconfig.json",
+    "build:watch": "npm run build -- --watch",
+    "lint": "tslint -c tslint.json -p tsconfig.json; tslint -c tslint.json -p test/tsconfig.json",
     "prepublish": "npm test",
-    "pretest": "npm run build",
-    "test": "npm run lint; tsc --project test/tsconfig.json; mocha --recursive ./test/dist"
+    "pretest": "npm run build; npm run lint; npm run test:build",
+    "test": "mocha --recursive ./test/dist",
+    "test:build": "tsc --project test/tsconfig.json",
+    "test:watch": "npm run test:build -- --watch & npm run test -- --watch"
   },
   "repository": {
     "type": "git",
