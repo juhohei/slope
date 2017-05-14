@@ -27,6 +27,20 @@ describe('S', () => {
       )
     })
 
+    it('keeps values intact', () => {
+      const stream1  = S.fromArray([1, 2, 3])
+      const stream2  = S.fromArray([[4], [5], [6]])
+      const expected = [[3, [4]], [3, [5]], [3, [6]]]
+      S.combine([stream1, stream2])(
+        value => {
+          expect(value).to.eql(expected.shift())
+        },
+        () => {
+          expect(undefined).to.eql(expected.shift())
+        }
+      )
+    })
+
   })
 
   describe('filter', () => {
