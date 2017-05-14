@@ -121,9 +121,12 @@ export function fromArray<T>(arr: Array<T>): Stream<T> {
 }
 
 export function fromEvent(element: HTMLElement, event: string): Stream<Event> {
-  return sink => {
+  return (sink, end = noop) => {
     element.addEventListener(event, sink)
-    return () => element.removeEventListener(event, sink)
+    return () => {
+      element.removeEventListener(event, sink)
+      end()
+    }
   }
 }
 
