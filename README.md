@@ -6,7 +6,7 @@ With [`slope-react`](https://github.com/juhohei/slope-react) you can easily `lif
 
 __Status__: Not ready for production
 - [ ] Fix `fork` - possibly allow only one subscriber / stream before fork is called
-- [ ] Fix `combine` - it currently flattens nested arrays
+- [x] ~Fix `combine` - it currently flattens nested arrays~
 - [ ] Error handling - not sure what would be the best way to implement this
 - [ ] Performance - not necessary, but check if `combine` could be optimized
 - [ ] Automatic currying - probably in the next version

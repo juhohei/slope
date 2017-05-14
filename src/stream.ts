@@ -1,7 +1,28 @@
-import {BinaryF, Noop, Stream, Subscriber, UnaryF, Unsubscribe} from './'
+import {BinaryF, Bus, Noop, Stream, Subscriber, UnaryF, Unsubscribe} from './'
+import {Action} from './create-action'
 
 export function combine(streams: Array<Stream<any>>): Stream<Array<any>> {
-  return streams.reduce(_combine, from([]))
+  return (sink, end = noop) => {
+    const push: Bus<any>       = Action()
+    let seenAll: boolean       = false
+    const seen: Array<boolean> = []
+    const payload: Array<any>  = []
+    const unsubs = streams.map((stream, i) => {
+      return stream(value => {
+        payload[i] = value
+        if (seenAll) {
+          push(payload)
+        } else {
+          seen[i] = true
+          if (seen.filter(x => x).length === streams.length) {
+            seenAll = true
+            push(payload)
+          }
+        }
+      })
+    })
+    return unsubscribeAll(unsubs.concat(push.stream(sink, end)))
+  }
 }
 
 export function filter<T>(fn: UnaryF<T, boolean>): (stream: Stream<T>) => Stream<T> {
@@ -212,33 +233,6 @@ export function tap<T>(fn: UnaryF<T, void>): (stream: Stream<T>) => Stream<T> {
     fn(value)
     return value
   })
-}
-
-function _combine(aStream: Stream<any>, bStream: Stream<any>): Stream<Array<any>> {
-  return (sink, end) => {
-    let latestA: any
-    let latestB: any
-    const push = () => {
-      if (latestA && latestB) {
-        sink([].concat(latestA, latestB))
-      }
-    }
-    const unsubscribeA = aStream(
-      value => {
-        latestA = value
-        push()
-      }
-    )
-    const unsubscribeB = bStream(
-      value => {
-        latestB = value
-        push()
-      },
-      end
-    )
-
-    return unsubscribeAll([unsubscribeA, unsubscribeB])
-  }
 }
 
 function noop(): void {}
