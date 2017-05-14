@@ -48,7 +48,20 @@ describe('S', () => {
 
   describe('flatMap', () => {
 
-    it('flattens a stream of streams of values to a stream of values', done => {
+    it('flattens a stream of streams of values to a stream of values (sync)', () => {
+      const stream   = S.fromArray([3, 2, 1])
+      const expected = [3, 2, 1]
+      S.flatMap<number, number>(S.from)(stream)(
+        value => {
+          expect(value).to.eql(expected.shift())
+        },
+        () => {
+          expect(undefined).to.eql(expected.shift())
+        }
+      )
+    })
+
+    it('flattens a stream of streams of values to a stream of values (async)', done => {
       const stream   = S.fromArray([3, 2, 1])
       const expected = [1, 2, 3]
       S.flatMap<number, number>(delayedStream)(stream)(
@@ -64,7 +77,21 @@ describe('S', () => {
 
   describe('flatMapLatest', () => {
 
-    it('flattens a stream of streams of values to a stream of values of the latest stream', done => {
+    it('flattens a stream of streams of values to a stream of values of the latest stream (sync)', () => {
+      const stream   = S.fromArray([3, 2, 1])
+      const expected = [3, 2, 1]
+      S.flatMapLatest<number, number>(S.from)(stream)(
+        value => {
+          expect(value).to.eql(expected.shift())
+        },
+        () => {
+          expect(undefined).to.eql(expected.shift())
+        }
+      )
+    })
+
+
+    it('flattens a stream of streams of values to a stream of values of the latest stream (async)', done => {
       const stream   = S.fromArray([3, 2, 1])
       const expected = [1]
       S.flatMapLatest<number, number>(delayedStream)(stream)(
