@@ -48,7 +48,7 @@ const count   = Action()
 const counter = S.scan((previous, next) => previous + next, 0)(count.stream)
 
 const unsubscribe = counter(
-  value => console.log(`The current value is ${value}`,
+  value => console.log(`The current value is ${value}`),
   end   => console.log('The stream has ended')
 )
 //logs 'The current value is 0'
