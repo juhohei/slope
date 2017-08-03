@@ -290,10 +290,10 @@ describe('S', () => {
 
   describe('sample', () => {
 
-    it('streams the latest value of the value stream when the trigger stream receives a value', done => {
+    it('streams the latest value of the streams when the trigger stream receives a value', done => {
       const stream   = S.fromArray([1, 2, 3, 4, 5])
       const sampler  = delayedStream(1)
-      const expected = [5]
+      const expected = [[5, 1]]
       S.sample(stream, sampler)(
         value => {
           expect(value).to.eql(expected.shift())

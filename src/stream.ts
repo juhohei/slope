@@ -211,12 +211,12 @@ export function pipe(fns: Array<(s: Stream<any>) => Stream<any>>): (stream: Stre
   return stream => fns.reduce((s, fn) => fn(s), stream)
 }
 
-export function sample<A, B>(stream: Stream<A>, sampler: Stream<B>): Stream<A> {
+export function sample<A, B>(stream: Stream<A>, sampler: Stream<B>): Stream<[A, B]> {
   return (sink, end) => {
     let payload: A
     return unsubscribeAll([
       stream(value => payload = value),
-      sampler(() => sink(payload), end)
+      sampler(value => sink([payload, value]), end)
     ])
   }
 }
