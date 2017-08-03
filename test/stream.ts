@@ -373,5 +373,21 @@ describe('S', () => {
 
   })
 
+  describe('throttle', () => {
+
+    it('passes stream values evey n milliseconds', done => {
+      const throttling = 150
+      const stream     = S.flatMap<number, number>(delayedStream)(S.fromArray([1, 2, 3]))
+      const expected    = [1, 3]
+      S.throttle<number>(throttling)(stream)(
+        value => {
+          expect(value).to.eql(expected.shift())
+        },
+        done
+      )
+    })
+
+  })
+
 })
 

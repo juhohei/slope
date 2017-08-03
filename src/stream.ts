@@ -264,6 +264,22 @@ export function tap<T>(fn: UnaryF<T, void>): (stream: Stream<T>) => Stream<T> {
   })
 }
 
+export function throttle<T>(n: Number): (stream: Stream<T>) => Stream<T> {
+  return stream => (sink, end) => {
+    let pass: Boolean = true
+    return stream(
+      value => {
+        if (pass) {
+          sink(value)
+          pass = false
+          setTimeout(() => pass = true, n)
+        }
+      },
+      end
+    )
+  }
+}
+
 function unsubscribeAll(subscribers: Array<Unsubscribe>): Unsubscribe {
   return () => subscribers.forEach((unsubscribe: Unsubscribe) => unsubscribe())
 }
